@@ -114,6 +114,104 @@ def ingest_logs():
         "count": count
     })
 
+# ---------- PROJECT ROUTES ----------
+
+# GET all projects
+@app.route('/api/projects', methods=['GET'])
+def get_projects():
+    conn = get_db()
+    projects = conn.execute(
+        "SELECT id, name, description, api_key, created_at FROM projects"
+    ).fetchall()
+
+    result = []
+    for p in projects:
+        result.append({
+            "id": p["id"],
+            "name": p["name"],
+            "description": p["description"],
+            "api_key": p["api_key"],
+            "created_at": p["created_at"]
+        })
+
+    conn.close()
+    return jsonify(result)
+
+
+# CREATE project
+@app.route('/api/projects', methods=['POST'])
+def create_project():
+    data = request.json
+    name = data.get('name')
+    description = data.get('description')
+
+    api_key = str(uuid.uuid4())
+    created_at = datetime.utcnow().isoformat()
+
+    conn = get_db()
+    conn.execute(
+        "INSERT INTO projects (name, description, api_key, created_at) VALUES (?, ?, ?, ?)",
+        (name, description, api_key, created_at)
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "message": "Project created",
+        "api_key": api_key
+    })
+
+
+# GET single project with logs
+@app.route('/api/projects/<int:project_id>', methods=['GET'])
+def get_project(project_id):
+    conn = get_db()
+
+    project = conn.execute(
+        "SELECT id, name, description, created_at FROM projects WHERE id=?",
+        (project_id,)
+    ).fetchone()
+
+    if not project:
+        conn.close()
+        return jsonify({"error": "Project not found"}), 404
+
+    logs = conn.execute(
+        "SELECT id, timestamp, level, message FROM logs WHERE project_id=?",
+        (project_id,)
+    ).fetchall()
+
+    conn.close()
+
+    return jsonify({
+        "id": project["id"],
+        "name": project["name"],
+        "description": project["description"],
+        "created_at": project["created_at"],
+        "logs": [
+            {
+                "id": l["id"],
+                "timestamp": l["timestamp"],
+                "level": l["level"],
+                "message": l["message"]
+            } for l in logs
+        ]
+    })
+
+
+# DELETE project
+@app.route('/api/projects/<int:project_id>', methods=['DELETE'])
+def delete_project(project_id):
+    conn = get_db()
+    conn.execute(
+        "DELETE FROM projects WHERE id=?",
+        (project_id,)
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Project deleted"})
+
 # ---------- START APP ----------
 if __name__ == "__main__":
     init_db()
