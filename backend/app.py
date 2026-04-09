@@ -4,11 +4,19 @@ import sqlite3
 import uuid
 from datetime import datetime
 from parser import parse_line
+import re
+import os
+from dotenv import load_dotenv
+from google import genai
+import requests as http_requests
 
 app = Flask(__name__)
 CORS(app)
 
 DB_NAME = "database.db"
+load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 
 # ---------- DATABASE SETUP ----------
 def get_db():
@@ -81,6 +89,8 @@ def ingest_logs():
         (api_key,)
     ).fetchone()
 
+    print("Project fetched:", project)
+
     if not project:
         return jsonify({"error": "Invalid API key"}), 401
 
@@ -108,6 +118,10 @@ def ingest_logs():
 
     conn.commit()
     conn.close()
+
+    # detects the errors in the logs
+    detect_errors(project["id"])
+    generate_ai_summary(project["id"]) # generates the ai summary
 
     return jsonify({
         "message": "Logs received",
@@ -211,6 +225,222 @@ def delete_project(project_id):
     conn.close()
 
     return jsonify({"message": "Project deleted"})
+
+
+# DETECT ERRORS function
+def detect_errors(project_id):
+    conn = get_db()
+
+    logs = conn.execute(
+        "SELECT message, timestamp, level FROM logs WHERE project_id=? AND (level='ERROR' OR level='WARN')",
+        (project_id,)
+    ).fetchall()
+
+    error_map = {}
+
+    def normalize(msg):
+        msg = msg.lower()
+        msg = re.sub(r'\d+', '', msg)
+        return msg.strip()
+
+    for log in logs:
+        normalized = normalize(log["message"])
+
+        if normalized not in error_map:
+            error_map[normalized] = {
+                "message": log["message"],
+                "count": 0,
+                "first_seen": log["timestamp"],
+                "last_seen": log["timestamp"]
+            }
+
+        error_map[normalized]["count"] += 1
+
+        if log["timestamp"] < error_map[normalized]["first_seen"]:
+            error_map[normalized]["first_seen"] = log["timestamp"]
+
+        if log["timestamp"] > error_map[normalized]["last_seen"]:
+            error_map[normalized]["last_seen"] = log["timestamp"]
+
+    def classify(msg):
+        m = msg.lower()
+        if any(x in m for x in ["crash", "fatal", "killed", "segfault", "panic"]):
+            return "Critical"
+        elif any(x in m for x in ["error", "failed", "exception", "refused", "unavailable"]):
+            return "High"
+        elif any(x in m for x in ["warn", "warning", "timeout", "slow", "retry"]):
+            return "Medium"
+        else:
+            return "Low"
+
+    for err in error_map.values():
+        severity = classify(err["message"])
+
+        conn.execute(
+            """
+            INSERT INTO errors (project_id, message, count, severity, first_seen, last_seen)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                project_id,
+                err["message"],
+                err["count"],
+                severity,
+                err["first_seen"],
+                err["last_seen"]
+            )
+        )
+
+    conn.commit()
+    conn.close()
+
+
+# GET errors for a project
+@app.route('/api/projects/<int:project_id>/errors', methods=['GET'])
+def get_project_errors(project_id):
+    conn = get_db()
+
+    errors = conn.execute(
+        """
+        SELECT id, message, count, severity, first_seen, last_seen
+        FROM errors
+        WHERE project_id=?
+        ORDER BY count DESC
+        """,
+        (project_id,)
+    ).fetchall()
+
+    conn.close()
+
+    return jsonify([
+        {
+            "id": e["id"],
+            "message": e["message"],
+            "count": e["count"],
+            "severity": e["severity"],
+            "first_seen": e["first_seen"],
+            "last_seen": e["last_seen"]
+        } for e in errors
+    ])
+
+# GENERATE AI SUMMARY function
+def generate_ai_summary(project_id):
+    print("👉 generate_ai_summary called for project:", project_id)
+
+    if not GEMINI_API_KEY:
+        print("❌ GEMINI_API_KEY is missing")
+        return
+    else:
+        print("✅ GEMINI_API_KEY found")
+
+    conn = get_db()
+
+    critical = conn.execute(
+        "SELECT * FROM errors WHERE project_id=? AND severity='Critical'",
+        (project_id,)
+    ).fetchall()
+
+    high = conn.execute(
+        "SELECT * FROM errors WHERE project_id=? AND severity='High' ORDER BY count DESC LIMIT 5",
+        (project_id,)
+    ).fetchall()
+
+    medium = conn.execute(
+        "SELECT * FROM errors WHERE project_id=? AND severity='Medium' ORDER BY count DESC LIMIT 3",
+        (project_id,)
+    ).fetchall()
+
+    selected_errors = list(critical) + list(high) + list(medium)
+    selected_errors = selected_errors[:20]
+
+    if not selected_errors:
+        conn.close()
+        return
+
+    error_text = "\n".join([
+        f"{e['message']} (count={e['count']}, severity={e['severity']})"
+        for e in selected_errors
+    ])
+
+    prompt = f"""
+    Analyze the following application errors:
+
+    {error_text}
+
+    Provide:
+    - Summary in simple English
+    - Root causes (bullet points)
+    - Recommended fixes (bullet points)
+    """
+
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+
+        body = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        }
+
+        response = http_requests.post(url, json=body)
+        result = response.json()
+        print("FULL API RESPONSE:", result)
+
+        text = result["candidates"][0]["content"]["parts"][0]["text"]
+        print("AI response generated, saving to DB...")
+
+        conn.execute(
+            """
+            INSERT INTO ai_insights (project_id, summary, root_causes, fixes, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                project_id,
+                text,
+                text,
+                text,
+                datetime.utcnow().isoformat()
+            )
+        )
+
+        conn.commit()
+
+    except Exception as e:
+        print("AI Error:", e)
+
+    conn.close()
+
+# GET latest AI insight for a project
+@app.route('/api/projects/<int:project_id>/insights', methods=['GET'])
+def get_project_insights(project_id):
+    conn = get_db()
+
+    insight = conn.execute(
+        """
+        SELECT summary, root_causes, fixes, created_at
+        FROM ai_insights
+        WHERE project_id=?
+        ORDER BY created_at DESC
+        LIMIT 1
+        """,
+        (project_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if not insight:
+        return jsonify({"message": "No insights found"})
+
+    return jsonify({
+        "summary": insight["summary"],
+        "root_causes": insight["root_causes"],
+        "fixes": insight["fixes"],
+        "created_at": insight["created_at"]
+    })
 
 # ---------- START APP ----------
 if __name__ == "__main__":
