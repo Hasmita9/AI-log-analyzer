@@ -9,6 +9,8 @@ import os
 from dotenv import load_dotenv
 from google import genai
 import requests as http_requests
+from flask import send_from_directory
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -374,8 +376,7 @@ def generate_ai_summary(project_id):
     """
 
     try:
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
-
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
         body = {
             "contents": [
                 {
@@ -390,7 +391,11 @@ def generate_ai_summary(project_id):
         result = response.json()
         print("FULL API RESPONSE:", result)
 
-        text = result["candidates"][0]["content"]["parts"][0]["text"]
+        if "candidates" in result:
+            text = result["candidates"][0]["content"]["parts"][0]["text"]
+        else:
+            print("Full API response:", result)
+            text = "AI summary unavailable (quota issue)"
         print("AI response generated, saving to DB...")
 
         conn.execute(
@@ -441,6 +446,16 @@ def get_project_insights(project_id):
         "fixes": insight["fixes"],
         "created_at": insight["created_at"]
     })
+
+# SERVE FRONTEND
+@app.route("/")
+def serve_frontend():
+    return send_from_directory("../frontend", "index.html")
+
+# SERVE STATIC FILES
+@app.route("/<path:path>")
+def serve_static(path):
+    return send_from_directory("../frontend", path)
 
 # ---------- START APP ----------
 if __name__ == "__main__":

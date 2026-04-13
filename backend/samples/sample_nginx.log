@@ -1,0 +1,20 @@
+2024/01/15 10:00:01 [error] 502 Bad Gateway
+2024/01/15 10:00:05 [error] 502 Bad Gateway
+2024/01/15 10:00:10 [warn] upstream response slow
+2024/01/15 10:00:15 [error] 502 Bad Gateway
+2024/01/15 10:00:20 [info] request handled
+2024/01/15 10:00:25 [error] 502 Bad Gateway
+2024/01/15 10:00:30 [error] 502 Bad Gateway
+2024/01/15 10:00:35 [warn] connection reset
+2024/01/15 10:00:40 [info] request completed
+2024/01/15 10:00:45 [error] 502 Bad Gateway
+2024/01/15 10:00:50 [warn] slow upstream
+2024/01/15 10:00:55 [error] 502 Bad Gateway
+2024/01/15 10:01:00 [info] request handled
+2024/01/15 10:01:05 [error] 502 Bad Gateway
+2024/01/15 10:01:10 [warn] timeout
+2024/01/15 10:01:15 [error] 502 Bad Gateway
+2024/01/15 10:01:20 [info] request completed
+2024/01/15 10:01:25 [error] 502 Bad Gateway
+2024/01/15 10:01:30 [warn] slow response
+2024/01/15 10:01:35 [error] 502 Bad Gateway

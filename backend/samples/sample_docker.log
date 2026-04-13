@@ -1,0 +1,20 @@
+{"time":"2024-01-15T10:00:01Z","level":"info","msg":"Container started"}
+{"time":"2024-01-15T10:00:05Z","level":"error","msg":"Crash detected"}
+{"time":"2024-01-15T10:00:10Z","level":"warn","msg":"High memory usage"}
+{"time":"2024-01-15T10:00:15Z","level":"error","msg":"Restarting container"}
+{"time":"2024-01-15T10:00:20Z","level":"info","msg":"Health check passed"}
+{"time":"2024-01-15T10:00:25Z","level":"error","msg":"Crash detected"}
+{"time":"2024-01-15T10:00:30Z","level":"error","msg":"Crash detected"}
+{"time":"2024-01-15T10:00:35Z","level":"warn","msg":"CPU spike"}
+{"time":"2024-01-15T10:00:40Z","level":"info","msg":"Restart successful"}
+{"time":"2024-01-15T10:00:45Z","level":"error","msg":"Network failure"}
+{"time":"2024-01-15T10:00:50Z","level":"warn","msg":"Retrying request"}
+{"time":"2024-01-15T10:00:55Z","level":"error","msg":"Network failure"}
+{"time":"2024-01-15T10:01:00Z","level":"info","msg":"Recovered"}
+{"time":"2024-01-15T10:01:05Z","level":"error","msg":"Disk full"}
+{"time":"2024-01-15T10:01:10Z","level":"warn","msg":"Disk nearing limit"}
+{"time":"2024-01-15T10:01:15Z","level":"error","msg":"Disk full"}
+{"time":"2024-01-15T10:01:20Z","level":"info","msg":"Cleanup triggered"}
+{"time":"2024-01-15T10:01:25Z","level":"error","msg":"Service crash"}
+{"time":"2024-01-15T10:01:30Z","level":"warn","msg":"Restart attempt"}
+{"time":"2024-01-15T10:01:35Z","level":"info","msg":"Service running"}
