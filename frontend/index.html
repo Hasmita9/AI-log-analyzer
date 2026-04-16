@@ -288,143 +288,188 @@
 
 </div>
 
+<!-- ONLY SCRIPT PART CHANGED BELOW, REST SAME -->
+
 <script>
 
-console.log("JS RUNNING");
-
-async function loadProjects() {
-  const res = await fetch("http://127.0.0.1:5000/api/projects");
-  const projects = await res.json();
-
-  const container = document.getElementById("projectsContainer");
-  container.innerHTML = "";
-
-  let totalErrors = 0;
-  let criticalCount = 0;
-
-  projects.forEach(p => {
-
-    const errors = Math.floor(Math.random() * 500);
-    totalErrors += errors;
-
-    const levels = ["low","medium","high","critical"];
-    const severity = levels[Math.floor(Math.random()*levels.length)];
-
-    if (severity === "critical") criticalCount++;
-
-    const card = `
-      <div class="card">
-        <h3>${p.name}</h3>
-        <p class="desc">Application monitoring</p>
-
-        <div class="trend">
-          <div style="height:10px"></div>
-          <div style="height:20px"></div>
-          <div style="height:15px"></div>
-          <div style="height:25px"></div>
+  console.log("JS RUNNING");
+  
+  async function loadProjects() {
+    const res = await fetch("http://127.0.0.1:5000/api/projects");
+    const projects = await res.json();
+  
+    const container = document.getElementById("projectsContainer");
+    container.innerHTML = "";
+  
+    let totalErrors = 0;
+    let criticalCount = 0;
+  
+    projects.forEach(p => {
+  
+      const errors = Math.floor(Math.random() * 500);
+      totalErrors += errors;
+  
+      const levels = ["low","medium","high","critical"];
+      const severity = levels[Math.floor(Math.random()*levels.length)];
+  
+      if (severity === "critical") criticalCount++;
+  
+      const card = `
+        <div class="card">
+          <h3>${p.name}</h3>
+          <p class="desc">Application monitoring</p>
+  
+          <div class="trend">
+            <div style="height:10px"></div>
+            <div style="height:20px"></div>
+            <div style="height:15px"></div>
+            <div style="height:25px"></div>
+          </div>
+  
+          <p class="errors">Errors: ${errors}</p>
+          <span class="badge ${severity}">${severity}</span>
+  
+          <p class="time">Last updated just now</p>
+  
+          <div class="actions">
+            <button onclick="viewProject(${p.id})">View</button>
+            <button class="delete" onclick="deleteProject(${p.id})">Delete</button>
+          </div>
         </div>
-
-        <p class="errors">Errors: ${errors}</p>
-        <span class="badge ${severity}">${severity}</span>
-
-        <p class="time">Last updated just now</p>
-
-        <div class="actions">
-          <button onclick="viewProject(${p.id})">View</button>
-          <button class="delete" onclick="deleteProject(${p.id})">Delete</button>
-        </div>
-      </div>
-    `;
-
-    container.insertAdjacentHTML("beforeend", card);
-  });
-
-  document.getElementById("totalProjects").innerText = projects.length;
-  document.getElementById("totalErrors").innerText = totalErrors;
-  document.getElementById("criticalErrors").innerText = criticalCount;
-}
-
-async function viewProject(id) {
-
-const grid = document.getElementById("projectsContainer");
-grid.style.display = "none";
-
-const detail = document.createElement("div");
-detail.id = "projectDetail";
-
-detail.innerHTML = `
-  <button onclick="goBack()">⬅ Back</button>
-  <h2>Project ID: ${id}</h2>
-  <p id="loading">Loading errors...</p>
-  <div id="errorsTable"></div>
-`;
-
-document.querySelector(".container").appendChild(detail);
-// 🔥 FETCH ERRORS
-const res = await fetch(`http://127.0.0.1:5000/api/projects/${id}/errors`);
-const errors = await res.json();
-
-document.getElementById("loading").remove();
-
-let table = `
-  <table border="1" style="margin-top:20px; width:100%; color:white;">
-    <tr>
-      <th>Error</th>
-      <th>Severity</th>
-      <th>Count</th>
-    </tr>
-`;
-
-const grouped = {};
-
-errors.forEach(e => {
-  if (!grouped[e.message]) {
-    grouped[e.message] = {
-      count: 0,
-      severity: e.severity
-    };
+      `;
+  
+      container.insertAdjacentHTML("beforeend", card);
+    });
+  
+    document.getElementById("totalProjects").innerText = projects.length;
+    document.getElementById("totalErrors").innerText = totalErrors;
+    document.getElementById("criticalErrors").innerText = criticalCount;
   }
-  grouped[e.message].count += e.count;
-});
-
-// 🔥 BUILD TABLE FROM GROUPED DATA
-for (let msg in grouped) {
-  table += `
-    <tr>
-      <td>${msg}</td>
-      <td>${grouped[msg].severity}</td>
-      <td>${grouped[msg].count}</td>
-    </tr>
+  
+  async function viewProject(id) {
+  
+  const grid = document.getElementById("projectsContainer");
+  grid.style.display = "none";
+  
+  const detail = document.createElement("div");
+  detail.id = "projectDetail";
+  
+  detail.innerHTML = `
+    <button onclick="goBack()">⬅ Back</button>
+    <h2>Project ID: ${id}</h2>
+    <p id="loading">Loading errors...</p>
+    <div id="errorsTable"></div>
+  
+    <!-- 🔥 ADDED BUTTON -->
+    <button onclick="generateInsights(${id})">🤖 Generate AI Insights</button>
+  
+    <!-- 🔥 ADDED PANEL -->
+    <div id="insightsPanel"></div>
   `;
-}
-
-table += `</table>`;
-
-document.getElementById("errorsTable").innerHTML = table;
-}
-
-function goBack() {
-document.getElementById("projectDetail").remove();
-document.getElementById("projectsContainer").style.display = "flex";
-}
-
-async function deleteProject(id) {
-  if (!confirm("Delete this project?")) return;
-
-  await fetch(`http://127.0.0.1:5000/api/projects/${id}`, {
-    method: "DELETE"
+  
+  document.querySelector(".container").appendChild(detail);
+  
+  // FETCH ERRORS
+  const res = await fetch(`http://127.0.0.1:5000/api/projects/${id}/errors`);
+  const errors = await res.json();
+  
+  document.getElementById("loading").remove();
+  
+  let table = `
+    <table border="1" style="margin-top:20px; width:100%; color:white;">
+      <tr>
+        <th>Error</th>
+        <th>Severity</th>
+        <th>Count</th>
+      </tr>
+  `;
+  
+  const grouped = {};
+  
+  errors.forEach(e => {
+    if (!grouped[e.message]) {
+      grouped[e.message] = {
+        count: 0,
+        severity: e.severity
+      };
+    }
+    grouped[e.message].count += e.count;
   });
-
-  loadProjects();
-}
-
-/* ONLY ADDITION */
-window.onload = function() {
-  console.log("Page loaded");
-  loadProjects();
-};
-
-</script>
-
+  
+  for (let msg in grouped) {
+    table += `
+      <tr>
+        <td>${msg}</td>
+        <td>${grouped[msg].severity}</td>
+        <td>${grouped[msg].count}</td>
+      </tr>
+    `;
+  }
+  
+  table += `</table>`;
+  
+  document.getElementById("errorsTable").innerHTML = table;
+  }
+  
+  function goBack() {
+  document.getElementById("projectDetail").remove();
+  document.getElementById("projectsContainer").style.display = "flex";
+  }
+  
+  async function deleteProject(id) {
+    if (!confirm("Delete this project?")) return;
+  
+    await fetch(`http://127.0.0.1:5000/api/projects/${id}`, {
+      method: "DELETE"
+    });
+  
+    loadProjects();
+  }
+  
+  window.onload = function() {
+    console.log("Page loaded");
+    loadProjects();
+  };
+  
+  
+  // 🔥 NEW FUNCTION (STEP 3)
+  async function generateInsights(id) {
+    const panel = document.getElementById("insightsPanel");
+  
+    panel.innerHTML = "⏳ Generating AI insights...";
+  
+    try {
+      const res = await fetch(`http://127.0.0.1:5000/api/projects/${id}/insights/generate`, {
+        method: "POST"
+      });
+  
+      const data = await res.json();
+  
+      if (data.error) {
+        panel.innerHTML = "❌ " + data.error;
+        return;
+      }
+  
+      panel.innerHTML = `
+        <div style="margin-top:20px;">
+          <h2>🤖 AI Insights</h2>
+  
+          <h3>Summary</h3>
+          <p>${data.summary}</p>
+  
+          <h3>Root Causes</h3>
+          <p>${data.root_causes}</p>
+  
+          <h3>Fixes</h3>
+          <p>${data.fixes}</p>
+        </div>
+      `;
+  
+    } catch (err) {
+      panel.innerHTML = "❌ Failed to fetch insights";
+    }
+  }
+  
+  </script>
 </body>
 </html>

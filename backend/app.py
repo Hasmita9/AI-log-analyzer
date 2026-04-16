@@ -447,6 +447,42 @@ def get_project_insights(project_id):
         "created_at": insight["created_at"]
     })
 
+# GENERATE AI INSIGHT ON DEMAND
+@app.route('/api/projects/<int:project_id>/insights/generate', methods=['POST'])
+def generate_insight_on_demand(project_id):
+    conn = get_db()
+    project = conn.execute("SELECT id FROM projects WHERE id=?", (project_id,)).fetchone()
+    conn.close()
+
+    if not project:
+        return jsonify({"error": "Project not found"}), 404
+
+    # 🔥 This calls Gemini AI (your existing function)
+    generate_ai_summary(project_id)
+
+    # Fetch latest generated insight
+    conn = get_db()
+    insight = conn.execute(
+        """
+        SELECT summary, root_causes, fixes, created_at
+        FROM ai_insights
+        WHERE project_id=?
+        ORDER BY created_at DESC
+        LIMIT 1
+        """,
+        (project_id,)
+    ).fetchone()
+    conn.close()
+
+    if not insight:
+        return jsonify({"error": "Could not generate insight"}), 500
+
+    return jsonify({
+        "summary": insight["summary"],
+        "root_causes": insight["root_causes"],
+        "fixes": insight["fixes"],
+        "created_at": insight["created_at"]
+    })
 # SERVE FRONTEND
 @app.route("/")
 def serve_frontend():
