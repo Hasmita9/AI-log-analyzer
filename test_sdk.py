@@ -3,7 +3,7 @@ import logging
 
 sdk = LogAnalyzerSDK(
     "http://127.0.0.1:5000",
-    "c59d4085-f795-4a11-b67e-8ca55958b6ab"
+    "fa44603c-23c7-48af-b308-0c22d0aad223"
 )
 
 sdk.capture_message("App started successfully")
@@ -15,6 +15,12 @@ except Exception as e:
 
 sdk.setup_auto_capture()
 
-logging.error("This is a test error from logging")
-logging.warning("This is a test warning")
-logging.info("This is an info message")
+# Simulate real-world errors
+logging.error("Database connection refused for user 123")
+logging.error("Payment failed for order 456")
+logging.error("Payment failed for order 456")  # duplicate (tests grouping)
+
+logging.warning("Retrying payment service due to timeout")
+logging.warning("Slow API response detected")
+
+logging.error("CRITICAL: System crash detected in auth service")

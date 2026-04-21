@@ -4,23 +4,13 @@
   <title>AI Log Analyzer</title>
 
   <style>
-
-  /* (YOUR FULL CSS — UNCHANGED, SAME AS BEFORE) */
-
-  /* BASE */
   body {
     margin: 0;
     font-family: Inter, sans-serif;
     background: radial-gradient(circle at top, #0f172a, #020617);
     color: #e2e8f0;
   }
-
-  /* LAYOUT */
-  .layout {
-    display: flex;
-  }
-
-  /* SIDEBAR */
+  .layout { display: flex; }
   .sidebar {
     width: 230px;
     height: 100vh;
@@ -29,11 +19,7 @@
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(255,255,255,0.05);
   }
-
-  .sidebar h2 {
-    margin-bottom: 40px;
-  }
-
+  .sidebar h2 { margin-bottom: 40px; }
   .sidebar-item {
     display: flex;
     align-items: center;
@@ -44,16 +30,8 @@
     transition: 0.2s;
     cursor: pointer;
   }
-
-  .sidebar-item:hover {
-    color: white;
-    transform: translateX(4px);
-  }
-
-  .main {
-    flex: 1;
-  }
-
+  .sidebar-item:hover { color: white; transform: translateX(4px); }
+  .main { flex: 1; }
   header {
     padding: 18px 28px;
     background: rgba(15, 23, 42, 0.6);
@@ -63,28 +41,10 @@
     justify-content: space-between;
     align-items: center;
   }
-
-  .logo {
-    font-weight: 600;
-    font-size: 15px;
-  }
-
-  .live {
-    color: #22c55e;
-    font-size: 12px;
-    margin-left: 10px;
-  }
-
-  .container {
-    padding: 30px;
-  }
-
-  .stats {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 25px;
-  }
-
+  .logo { font-weight: 600; font-size: 15px; }
+  .live { color: #22c55e; font-size: 12px; margin-left: 10px; }
+  .container { padding: 30px; }
+  .stats { display: flex; gap: 20px; margin-bottom: 25px; }
   .stat-card {
     flex: 1;
     padding: 20px;
@@ -95,7 +55,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .stat-card::after {
     content: "";
     position: absolute;
@@ -103,24 +62,9 @@
     background: radial-gradient(circle at top right, rgba(99,102,241,0.15), transparent 60%);
     opacity: 0.6;
   }
-
-  .stat-card p {
-    color: #94a3b8;
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-
-  .stat-card h2 {
-    font-size: 26px;
-    color: #f1f5f9;
-  }
-
-  .search-box {
-    position: relative;
-    width: 280px;
-    margin-bottom: 25px;
-  }
-
+  .stat-card p { color: #94a3b8; font-size: 12px; margin-bottom: 6px; }
+  .stat-card h2 { font-size: 26px; color: #f1f5f9; }
+  .search-box { position: relative; width: 280px; margin-bottom: 25px; }
   .search {
     width: 100%;
     padding: 12px 16px 12px 36px;
@@ -129,21 +73,8 @@
     background: rgba(255,255,255,0.05);
     color: white;
   }
-
-  .search-icon {
-    position: absolute;
-    left: 12px;
-    top: 10px;
-    font-size: 14px;
-    color: #94a3b8;
-  }
-
-  .grid {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-
+  .search-icon { position: absolute; left: 12px; top: 10px; font-size: 14px; color: #94a3b8; }
+  .grid { display: flex; gap: 24px; flex-wrap: wrap; }
   .card {
     width: 260px;
     padding: 20px;
@@ -153,58 +84,18 @@
     border: 1px solid rgba(255,255,255,0.06);
     transition: 0.25s ease;
   }
-
-  .card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 30px rgba(99,102,241,0.25);
-  }
-
-  h3 {
-    color: #f1f5f9;
-  }
-
-  .desc {
-    color: #94a3b8;
-    font-size: 13px;
-  }
-
-  .errors {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #cbd5f5;
-  }
-
-  .time {
-    font-size: 12px;
-    color: #64748b;
-    margin-top: 6px;
-  }
-
-  .trend {
-    display: flex;
-    align-items: flex-end;
-    gap: 3px;
-    height: 40px;
-    margin: 14px 0;
-  }
-
-  .trend div {
-    width: 3px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, #22d3ee, #6366f1);
-  }
-
-  .badge {
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-  }
-
+  .card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(99,102,241,0.25); }
+  h3 { color: #f1f5f9; }
+  .desc { color: #94a3b8; font-size: 13px; }
+  .errors { margin-top: 8px; font-size: 14px; color: #cbd5f5; }
+  .time { font-size: 12px; color: #64748b; margin-top: 6px; }
+  .trend { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin: 14px 0; }
+  .trend div { width: 3px; border-radius: 2px; background: linear-gradient(180deg, #22d3ee, #6366f1); }
+  .badge { padding: 5px 10px; border-radius: 999px; font-size: 11px; }
   .badge.critical { background: rgba(239,68,68,0.08); color: #fca5a5; }
   .badge.high { background: rgba(251,146,60,0.08); color: #fdba74; }
   .badge.medium { background: rgba(250,204,21,0.08); color: #fde047; }
   .badge.low { background: rgba(148,163,184,0.08); color: #cbd5f5; }
-
   button {
     padding: 6px 12px;
     border-radius: 8px;
@@ -213,34 +104,130 @@
     color: #c7d2fe;
     cursor: pointer;
   }
-
-  button:hover {
-    background: rgba(99,102,241,0.3);
-  }
-
+  button:hover { background: rgba(99,102,241,0.3); }
   .delete {
     background: transparent;
     border: 1px solid rgba(248,113,113,0.4);
     color: #fca5a5;
     margin-left: 8px;
   }
-
-  .delete:hover {
-    background: rgba(248,113,113,0.1);
+  .delete:hover { background: rgba(248,113,113,0.1); }
+  .actions { margin-top: 12px; }
+  .ai-btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid rgba(99,102,241,0.3);
+    box-shadow: 0 0 10px rgba(99,102,241,0.2);
+    background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(99,102,241,0.08));
+    backdrop-filter: blur(12px);
+    color: #e0e7ff;
+    transition: all 0.25s ease;
+  }
+  .ai-btn:hover {
+    background: linear-gradient(135deg, rgba(99,102,241,0.35), rgba(99,102,241,0.15));
+    box-shadow: 0 0 20px rgba(99,102,241,0.35), inset 0 0 10px rgba(255,255,255,0.05);
+    transform: translateY(-2px);
+  }
+  .ai-panel {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .ai-section { margin-top: 16px; }
+  .ai-section h3 { font-size: 14px; color: #a5b4fc; margin-bottom: 6px; }
+  .ai-section p { font-size: 13px; color: #cbd5f5; line-height: 1.6; }
+  .tabs { display: flex; gap: 10px; margin: 15px 0; }
+  .tab {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    color: #94a3b8;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+    font-family: Inter, sans-serif;
+  }
+  .tab:hover { background: rgba(99,102,241,0.15); color: #c7d2fe; }
+  .tab.active {
+    box-shadow: 0 0 10px rgba(99,102,241,0.4);
+    background: rgba(99,102,241,0.25);
+    color: #e0e7ff;
+    border: 1px solid rgba(99,102,241,0.4);
   }
 
-  .actions {
-    margin-top: 12px;
+  /* ── TAB CONTENT: hidden by default, shown only when .active ── */
+  .tab-content {
+    display: none !important;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #cbd5f5;
+    line-height: 1.8;
+  }
+  .tab-content.active {
+    display: block !important;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* ── Readable content styles ── */
+  .tab-content h3 {
+    font-size: 14px;
+    color: #a5b4fc;
+    margin: 18px 0 6px;
+    letter-spacing: 0.02em;
+  }
+  .tab-content ul {
+    margin: 8px 0 12px 0;
+    padding-left: 20px;
+  }
+  .tab-content li {
+    margin-bottom: 8px;
+    color: #cbd5f5;
+  }
+  .tab-content p { margin: 6px 0 12px; }
+
+  /* ── Highlight colours ── */
+  .hl-red {
+    background: rgba(239,68,68,0.18);
+    color: #fca5a5;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+  .hl-yellow {
+    background: rgba(250,204,21,0.18);
+    color: #fde047;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+  .hl-blue {
+    background: rgba(59,130,246,0.18);
+    color: #93c5fd;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+
+  .highlight { padding: 2px 6px; border-radius: 6px; font-weight: 600; }
+  .highlight.critical { background: rgba(239,68,68,0.2); color: #f87171; }
+  .highlight.high { background: rgba(245,158,11,0.2); color: #fbbf24; }
+  .highlight.error { background: rgba(59,130,246,0.2); color: #60a5fa; }
   </style>
 
 </head>
-
 <body>
 
 <div class="layout">
-
   <div class="sidebar">
     <h2>⚡</h2>
     <div class="sidebar-item">📁 Projects</div>
@@ -249,29 +236,16 @@
   </div>
 
   <div class="main">
-
     <header>
       <div class="logo">⚡ AI Log Analyzer <span class="live">● LIVE</span></div>
       <button onclick="loadProjects()">Refresh</button>
     </header>
 
     <div class="container">
-
       <div class="stats">
-        <div class="stat-card">
-          <p>Projects</p>
-          <h2 id="totalProjects">0</h2>
-        </div>
-
-        <div class="stat-card">
-          <p>Errors</p>
-          <h2 id="totalErrors">0</h2>
-        </div>
-
-        <div class="stat-card">
-          <p>Critical</p>
-          <h2 id="criticalErrors" style="color:#f87171;">0</h2>
-        </div>
+        <div class="stat-card"><p>Projects</p><h2 id="totalProjects">0</h2></div>
+        <div class="stat-card"><p>Errors</p><h2 id="totalErrors">0</h2></div>
+        <div class="stat-card"><p>Critical</p><h2 id="criticalErrors" style="color:#f87171;">0</h2></div>
       </div>
 
       <div class="search-box">
@@ -280,196 +254,268 @@
       </div>
 
       <h2>Projects</h2>
-
       <div class="grid" id="projectsContainer"></div>
-
     </div>
   </div>
-
 </div>
 
-<!-- ONLY SCRIPT PART CHANGED BELOW, REST SAME -->
-
 <script>
-
   console.log("JS RUNNING");
-  
+
+  /* store all projects for search filtering */
+  var allProjects = [];
+
   async function loadProjects() {
     const res = await fetch("http://127.0.0.1:5000/api/projects");
-    const projects = await res.json();
-  
+    allProjects = await res.json();
+
+    /* fetch errors for every project to get real severity + counts */
+    let totalErrors = 0, criticalCount = 0;
+    await Promise.all(allProjects.map(async p => {
+      try {
+        const r = await fetch("http://127.0.0.1:5000/api/projects/" + p.id + "/errors");
+        const errs = await r.json();
+        let hasCritical = false, errTotal = 0;
+        errs.forEach(e => {
+          errTotal += e.count;
+          if (e.severity && e.severity.toLowerCase() === "critical") hasCritical = true;
+        });
+        p._errorCount  = errTotal;
+        p._hasCritical = hasCritical;
+        p._severity    = hasCritical ? "critical"
+                       : errs.some(e => e.severity && e.severity.toLowerCase() === "high")    ? "high"
+                       : errs.some(e => e.severity && e.severity.toLowerCase() === "medium")  ? "medium"
+                       : "low";
+        totalErrors += errTotal;
+        if (hasCritical) criticalCount++;
+      } catch(e) {
+        p._errorCount = 0; p._hasCritical = false; p._severity = "low";
+      }
+    }));
+
+    document.getElementById("totalProjects").innerText = allProjects.length;
+    document.getElementById("totalErrors").innerText   = totalErrors;
+    document.getElementById("criticalErrors").innerText = criticalCount;
+
+    renderCards(allProjects);
+
+    /* wire up search */
+    const searchInput = document.querySelector(".search");
+    searchInput.oninput = function() {
+      const q = this.value.toLowerCase().trim();
+      const filtered = q ? allProjects.filter(p => p.name.toLowerCase().includes(q)) : allProjects;
+      renderCards(filtered);
+    };
+  }
+
+  function renderCards(projects) {
     const container = document.getElementById("projectsContainer");
     container.innerHTML = "";
-  
-    let totalErrors = 0;
-    let criticalCount = 0;
-  
     projects.forEach(p => {
-  
-      const errors = Math.floor(Math.random() * 500);
-      totalErrors += errors;
-  
-      const levels = ["low","medium","high","critical"];
-      const severity = levels[Math.floor(Math.random()*levels.length)];
-  
-      if (severity === "critical") criticalCount++;
-  
+      const severity = p._severity || "low";
+      const errors   = p._errorCount || 0;
       const card = `
         <div class="card">
           <h3>${p.name}</h3>
           <p class="desc">Application monitoring</p>
-  
           <div class="trend">
             <div style="height:10px"></div>
             <div style="height:20px"></div>
             <div style="height:15px"></div>
             <div style="height:25px"></div>
           </div>
-  
           <p class="errors">Errors: ${errors}</p>
           <span class="badge ${severity}">${severity}</span>
-  
           <p class="time">Last updated just now</p>
-  
           <div class="actions">
             <button onclick="viewProject(${p.id})">View</button>
             <button class="delete" onclick="deleteProject(${p.id})">Delete</button>
           </div>
-        </div>
-      `;
-  
+        </div>`;
       container.insertAdjacentHTML("beforeend", card);
     });
-  
-    document.getElementById("totalProjects").innerText = projects.length;
-    document.getElementById("totalErrors").innerText = totalErrors;
-    document.getElementById("criticalErrors").innerText = criticalCount;
   }
-  
+
   async function viewProject(id) {
-  
-  const grid = document.getElementById("projectsContainer");
-  grid.style.display = "none";
-  
-  const detail = document.createElement("div");
-  detail.id = "projectDetail";
-  
-  detail.innerHTML = `
-    <button onclick="goBack()">⬅ Back</button>
-    <h2>Project ID: ${id}</h2>
-    <p id="loading">Loading errors...</p>
-    <div id="errorsTable"></div>
-  
-    <!-- 🔥 ADDED BUTTON -->
-    <button onclick="generateInsights(${id})">🤖 Generate AI Insights</button>
-  
-    <!-- 🔥 ADDED PANEL -->
-    <div id="insightsPanel"></div>
-  `;
-  
-  document.querySelector(".container").appendChild(detail);
-  
-  // FETCH ERRORS
-  const res = await fetch(`http://127.0.0.1:5000/api/projects/${id}/errors`);
-  const errors = await res.json();
-  
-  document.getElementById("loading").remove();
-  
-  let table = `
-    <table border="1" style="margin-top:20px; width:100%; color:white;">
-      <tr>
-        <th>Error</th>
-        <th>Severity</th>
-        <th>Count</th>
-      </tr>
-  `;
-  
-  const grouped = {};
-  
-  errors.forEach(e => {
-    if (!grouped[e.message]) {
-      grouped[e.message] = {
-        count: 0,
-        severity: e.severity
+    const grid = document.getElementById("projectsContainer");
+    grid.style.display = "none";
+
+    const detail = document.createElement("div");
+    detail.id = "projectDetail";
+    detail.innerHTML = `
+      <button onclick="goBack()">&#8592; Back</button>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h2 style="margin:0;">Project ID: ${id}</h2>
+        <button class="ai-btn" onclick="generateInsights(${id})">&#x1F916; Generate AI Insights</button>
+      </div>
+      <p id="loading">Loading errors...</p>
+      <div id="errorsTable"></div>
+      <div id="insightsPanel"></div>`;
+
+    document.querySelector(".container").appendChild(detail);
+
+    const res = await fetch("http://127.0.0.1:5000/api/projects/" + id + "/errors");
+    const errors = await res.json();
+    document.getElementById("loading").remove();
+
+    const grouped = {};
+    errors.forEach(e => {
+      if (!grouped[e.message]) grouped[e.message] = { count: 0, severity: e.severity || "low" };
+      grouped[e.message].count += e.count;
+    });
+
+    /* severity sort order */
+    const order = { critical: 0, high: 1, medium: 2, low: 3 };
+    const rows = Object.entries(grouped).sort((a, b) =>
+      (order[a[1].severity.toLowerCase()] ?? 4) - (order[b[1].severity.toLowerCase()] ?? 4)
+    );
+
+    const severityBadge = sev => {
+      const s = (sev || "low").toLowerCase();
+      const colors = {
+        critical: "background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3)",
+        high:     "background:rgba(251,146,60,0.15);color:#fdba74;border:1px solid rgba(251,146,60,0.3)",
+        medium:   "background:rgba(250,204,21,0.15);color:#fde047;border:1px solid rgba(250,204,21,0.3)",
+        low:      "background:rgba(148,163,184,0.1);color:#cbd5f5;border:1px solid rgba(148,163,184,0.2)"
       };
-    }
-    grouped[e.message].count += e.count;
-  });
-  
-  for (let msg in grouped) {
-    table += `
-      <tr>
-        <td>${msg}</td>
-        <td>${grouped[msg].severity}</td>
-        <td>${grouped[msg].count}</td>
-      </tr>
-    `;
+      return `<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;${colors[s]||colors.low}">${sev}</span>`;
+    };
+
+    let tableHTML = `
+      <div style="margin-top:20px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:rgba(99,102,241,0.15);">
+              <th style="padding:12px 16px;text-align:left;font-size:12px;color:#a5b4fc;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Error</th>
+              <th style="padding:12px 16px;text-align:center;font-size:12px;color:#a5b4fc;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Severity</th>
+              <th style="padding:12px 16px;text-align:right;font-size:12px;color:#a5b4fc;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Count</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+    rows.forEach(([msg, data], i) => {
+      const bg = i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent";
+      tableHTML += `
+        <tr style="background:${bg};border-top:1px solid rgba(255,255,255,0.04);">
+          <td style="padding:12px 16px;font-size:13px;color:#e2e8f0;">${msg}</td>
+          <td style="padding:12px 16px;text-align:center;">${severityBadge(data.severity)}</td>
+          <td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:600;color:#f1f5f9;">${data.count}</td>
+        </tr>`;
+    });
+
+    tableHTML += `</tbody></table></div>`;
+    document.getElementById("errorsTable").innerHTML = tableHTML;
   }
-  
-  table += `</table>`;
-  
-  document.getElementById("errorsTable").innerHTML = table;
-  }
-  
+
   function goBack() {
-  document.getElementById("projectDetail").remove();
-  document.getElementById("projectsContainer").style.display = "flex";
+    document.getElementById("projectDetail").remove();
+    document.getElementById("projectsContainer").style.display = "flex";
   }
-  
+
   async function deleteProject(id) {
     if (!confirm("Delete this project?")) return;
-  
-    await fetch(`http://127.0.0.1:5000/api/projects/${id}`, {
-      method: "DELETE"
-    });
-  
+    await fetch("http://127.0.0.1:5000/api/projects/" + id, { method: "DELETE" });
     loadProjects();
   }
-  
+
   window.onload = function() {
     console.log("Page loaded");
     loadProjects();
   };
-  
-  
-  // 🔥 NEW FUNCTION (STEP 3)
-  async function generateInsights(id) {
-    const panel = document.getElementById("insightsPanel");
-  
-    panel.innerHTML = "⏳ Generating AI insights...";
-  
-    try {
-      const res = await fetch(`http://127.0.0.1:5000/api/projects/${id}/insights/generate`, {
-        method: "POST"
-      });
-  
-      const data = await res.json();
-  
-      if (data.error) {
-        panel.innerHTML = "❌ " + data.error;
-        return;
+
+  /* Split a single AI text blob into 3 sections by heading keywords */
+  function splitIntoSections(text) {
+    var lines   = text.split("\n");
+    var current = "summary";
+    var buckets = { summary: [], causes: [], fixes: [] };
+
+    lines.forEach(function(line) {
+      var t = line.trim();
+      var isHeading = t.charAt(0) === "#" || /^[A-Z][A-Za-z ]{2,40}:?$/.test(t);
+      if (isHeading) {
+        if (/root.{0,5}caus/i.test(t))             { current = "causes";  return; }
+        if (/fix|solution|recommend|suggest/i.test(t)) { current = "fixes";   return; }
+        if (/summary/i.test(t))                     { current = "summary"; return; }
       }
-  
-      panel.innerHTML = `
-        <div style="margin-top:20px;">
-          <h2>🤖 AI Insights</h2>
-  
-          <h3>Summary</h3>
-          <p>${data.summary}</p>
-  
-          <h3>Root Causes</h3>
-          <p>${data.root_causes}</p>
-  
-          <h3>Fixes</h3>
-          <p>${data.fixes}</p>
-        </div>
-      `;
-  
+      buckets[current].push(line);
+    });
+
+    return {
+      summary: buckets.summary.join("\n").trim(),
+      causes:  buckets.causes.join("\n").trim(),
+      fixes:   buckets.fixes.join("\n").trim()
+    };
+  }
+
+  async function generateInsights(id) {
+    var panel = document.getElementById("insightsPanel");
+    panel.innerHTML = "&#9203; Generating AI insights...";
+
+    try {
+      var res  = await fetch("http://127.0.0.1:5000/api/projects/" + id + "/insights/generate", { method: "POST" });
+      var data = await res.json();
+
+      if (data.error) { panel.innerHTML = "&#10060; " + data.error; return; }
+
+      var summaryText = (data.summary     || "").trim();
+      var causesText  = (data.root_causes || "").trim();
+      var fixesText   = (data.fixes       || "").trim();
+
+      /* If backend lumps everything into one field, split it */
+      var noSplit = !causesText && !fixesText;
+      var allMixed = causesText && /summary/i.test(causesText);
+      if (noSplit || allMixed) {
+        var blob  = summaryText + "\n" + causesText + "\n" + fixesText;
+        var split = splitIntoSections(blob);
+        summaryText = split.summary;
+        causesText  = split.causes;
+        fixesText   = split.fixes;
+      }
+
+      panel.innerHTML =
+        '<div class="ai-panel">' +
+          '<h2>&#x1F916; AI Insights</h2>' +
+          '<div class="tabs">' +
+            '<button class="tab active" data-tab="summary">Summary</button>' +
+            '<button class="tab" data-tab="causes">Root Causes</button>' +
+            '<button class="tab" data-tab="fixes">Fixes</button>' +
+          '</div>' +
+          '<div class="tab-content active" data-content="summary"><div>' + formatText(summaryText) + '</div></div>' +
+          '<div class="tab-content" data-content="causes"><div>' + formatText(causesText) + '</div></div>' +
+          '<div class="tab-content" data-content="fixes"><div>' + formatText(fixesText) + '</div></div>' +
+        '</div>';
+
+      panel.querySelectorAll(".tab").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          var target  = this.getAttribute("data-tab");
+          var panelEl = this.closest(".ai-panel");
+          panelEl.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); });
+          panelEl.querySelectorAll(".tab-content").forEach(function(c) { c.classList.remove("active"); });
+          this.classList.add("active");
+          panelEl.querySelector('.tab-content[data-content="' + target + '"]').classList.add("active");
+        });
+      });
+
     } catch (err) {
-      panel.innerHTML = "❌ Failed to fetch insights";
+      panel.innerHTML = "&#10060; Failed to fetch insights";
     }
   }
-  
-  </script>
+
+  function formatText(text) {
+    if (!text) return "";
+    return text
+      .replace(/^###\s*(.+)$/gm, "<h3>$1</h3>")
+      .replace(/^##\s*(.+)$/gm,  "<h3>$1</h3>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/^[\*\-]\s+(.+)$/gm, "<li>$1</li>")
+      .replace(/^\s{2,}[\*\-]\s+(.+)$/gm, "<li style='margin-left:16px'>$1</li>")
+      .replace(/(<li[\s\S]*?<\/li>)(\s*<li[\s\S]*?<\/li>)*/g, "<ul>$&</ul>")
+      .replace(/\b(crash(?:ed|ing)?|fatal(?:ly)?|critical|unhandled exception|OOM|out of memory|terminated|killed)\b/gi, '<span class="hl-red">$1</span>')
+      .replace(/\b(warning|memory leak|slow|degraded|timeout|retry|spike|peak load)\b/gi, '<span class="hl-yellow">$1</span>')
+      .replace(/\b(fix|patch|update|monitor|restart|check|review|implement|configure)\b/gi, '<span class="hl-blue">$1</span>')
+      .replace(/\n{2,}/g, "</p><p>")
+      .replace(/\n/g, "<br>");
+  }
+</script>
 </body>
 </html>

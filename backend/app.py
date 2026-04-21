@@ -278,20 +278,27 @@ def detect_errors(project_id):
     for err in error_map.values():
         severity = classify(err["message"])
 
-        conn.execute(
-            """
-            INSERT INTO errors (project_id, message, count, severity, first_seen, last_seen)
-            VALUES (?, ?, ?, ?, ?, ?)
-            """,
-            (
-                project_id,
-                err["message"],
-                err["count"],
-                severity,
-                err["first_seen"],
-                err["last_seen"]
+        existing = conn.execute(
+            "SELECT id FROM errors WHERE project_id=? AND message=?",
+            (project_id, err["message"])
+        ).fetchone()
+
+        if existing:
+            conn.execute(
+                """
+                UPDATE errors SET count=?, severity=?, last_seen=?
+                WHERE project_id=? AND message=?
+                """,
+                (err["count"], severity, err["last_seen"], project_id, err["message"])
             )
-        )
+        else:
+            conn.execute(
+                """
+                INSERT INTO errors (project_id, message, count, severity, first_seen, last_seen)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (project_id, err["message"], err["count"], severity, err["first_seen"], err["last_seen"])
+            )
 
     conn.commit()
     conn.close()

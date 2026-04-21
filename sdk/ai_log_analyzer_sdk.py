@@ -19,7 +19,7 @@ class LogAnalyzerSDK:
             print("SDK failed to send log:", e)
 
     def capture_exception(self, error):
-        error_message = f"ERROR {str(error)}\n{traceback.format_exc()}"
+        error_message = f"ERROR {type(error).__name__}: {str(error)}"
         self._send_log(error_message)
 
     def capture_message(self, message):
