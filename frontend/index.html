@@ -18,6 +18,8 @@
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(255,255,255,0.05);
+    position: sticky;
+    top: 0;
   }
   .sidebar h2 { margin-bottom: 40px; }
   .sidebar-item {
@@ -29,9 +31,12 @@
     font-size: 14px;
     transition: 0.2s;
     cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 8px;
   }
-  .sidebar-item:hover { color: white; transform: translateX(4px); }
-  .main { flex: 1; }
+  .sidebar-item:hover { color: white; transform: translateX(4px); background: rgba(255,255,255,0.04); }
+  .sidebar-item.active { color: white; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.2); }
+  .main { flex: 1; overflow-y: auto; }
   header {
     padding: 18px 28px;
     background: rgba(15, 23, 42, 0.6);
@@ -40,6 +45,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   .logo { font-weight: 600; font-size: 15px; }
   .live { color: #22c55e; font-size: 12px; margin-left: 10px; }
@@ -72,6 +80,7 @@
     border: none;
     background: rgba(255,255,255,0.05);
     color: white;
+    box-sizing: border-box;
   }
   .search-icon { position: absolute; left: 12px; top: 10px; font-size: 14px; color: #94a3b8; }
   .grid { display: flex; gap: 24px; flex-wrap: wrap; }
@@ -160,8 +169,6 @@
     color: #e0e7ff;
     border: 1px solid rgba(99,102,241,0.4);
   }
-
-  /* ── TAB CONTENT: hidden by default, shown only when .active ── */
   .tab-content {
     display: none !important;
     margin-top: 10px;
@@ -177,51 +184,187 @@
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
-  /* ── Readable content styles ── */
   .tab-content h3 {
     font-size: 14px;
     color: #a5b4fc;
     margin: 18px 0 6px;
     letter-spacing: 0.02em;
   }
-  .tab-content ul {
-    margin: 8px 0 12px 0;
-    padding-left: 20px;
-  }
-  .tab-content li {
-    margin-bottom: 8px;
-    color: #cbd5f5;
-  }
+  .tab-content ul { margin: 8px 0 12px 0; padding-left: 20px; }
+  .tab-content li { margin-bottom: 8px; color: #cbd5f5; }
   .tab-content p { margin: 6px 0 12px; }
-
-  /* ── Highlight colours ── */
-  .hl-red {
-    background: rgba(239,68,68,0.18);
-    color: #fca5a5;
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-weight: 600;
-  }
-  .hl-yellow {
-    background: rgba(250,204,21,0.18);
-    color: #fde047;
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-weight: 600;
-  }
-  .hl-blue {
-    background: rgba(59,130,246,0.18);
-    color: #93c5fd;
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-weight: 600;
-  }
-
+  .hl-red { background: rgba(239,68,68,0.18); color: #fca5a5; padding: 1px 6px; border-radius: 5px; font-weight: 600; }
+  .hl-yellow { background: rgba(250,204,21,0.18); color: #fde047; padding: 1px 6px; border-radius: 5px; font-weight: 600; }
+  .hl-blue { background: rgba(59,130,246,0.18); color: #93c5fd; padding: 1px 6px; border-radius: 5px; font-weight: 600; }
   .highlight { padding: 2px 6px; border-radius: 6px; font-weight: 600; }
   .highlight.critical { background: rgba(239,68,68,0.2); color: #f87171; }
   .highlight.high { background: rgba(245,158,11,0.2); color: #fbbf24; }
   .highlight.error { background: rgba(59,130,246,0.2); color: #60a5fa; }
+
+  /* ── Create Project Button ── */
+  .create-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: 1px solid rgba(99,102,241,0.4);
+    background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(99,102,241,0.1));
+    color: #c7d2fe;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+  }
+  .create-btn:hover {
+    background: linear-gradient(135deg, rgba(99,102,241,0.4), rgba(99,102,241,0.2));
+    box-shadow: 0 0 16px rgba(99,102,241,0.3);
+    transform: translateY(-1px);
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #0f172a;
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 18px;
+    padding: 32px;
+    width: 420px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.1);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal h3 { margin: 0 0 6px; font-size: 18px; color: #f1f5f9; }
+  .modal p  { margin: 0 0 24px; font-size: 13px; color: #64748b; }
+  .modal label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .modal input, .modal textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.05);
+    color: #f1f5f9;
+    font-size: 14px;
+    font-family: Inter, sans-serif;
+    box-sizing: border-box;
+    margin-bottom: 18px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .modal input:focus, .modal textarea:focus { border-color: rgba(99,102,241,0.5); }
+  .modal textarea { resize: none; height: 80px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+  .modal-cancel {
+    padding: 9px 18px;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .modal-cancel:hover { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+  .modal-submit {
+    padding: 9px 20px;
+    border-radius: 9px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-submit:hover { box-shadow: 0 0 16px rgba(99,102,241,0.5); transform: translateY(-1px); }
+
+  /* ── API Key Result ── */
+  .api-key-box {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.25);
+  }
+  .api-key-box p { margin: 0 0 8px; font-size: 12px; color: #86efac; }
+  .api-key-value {
+    font-family: monospace;
+    font-size: 13px;
+    color: #f1f5f9;
+    word-break: break-all;
+    background: rgba(0,0,0,0.3);
+    padding: 8px 10px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .copy-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.07);
+    color: #cbd5f5;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.12); }
+
+  /* ── Errors page ── */
+  #errorsPage { display: none; }
+  .page-title { font-size: 20px; font-weight: 600; color: #f1f5f9; margin-bottom: 20px; }
+
+  /* ── Settings page ── */
+  #settingsPage { display: none; }
+  .settings-card {
+    max-width: 520px;
+    padding: 24px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 20px;
+  }
+  .settings-card h3 { margin: 0 0 6px; font-size: 15px; color: #f1f5f9; }
+  .settings-card p  { margin: 0 0 14px; font-size: 13px; color: #64748b; }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .settings-row label { font-size: 13px; color: #94a3b8; }
+  .toggle {
+    width: 40px; height: 22px;
+    background: rgba(99,102,241,0.4);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+  }
+  .toggle::after {
+    content: "";
+    position: absolute;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: left 0.2s;
+  }
+  .toggle.on { background: #6366f1; }
+  .toggle.on::after { left: 21px; }
   </style>
 
 </head>
@@ -230,18 +373,22 @@
 <div class="layout">
   <div class="sidebar">
     <h2>⚡</h2>
-    <div class="sidebar-item">📁 Projects</div>
-    <div class="sidebar-item">🐞 Errors</div>
-    <div class="sidebar-item">⚙️ Settings</div>
+    <div class="sidebar-item active" id="nav-projects" onclick="showPage('projects')">📁 Projects</div>
+    <div class="sidebar-item" id="nav-errors" onclick="showPage('errors')">🐞 Errors</div>
+    <div class="sidebar-item" id="nav-settings" onclick="showPage('settings')">⚙️ Settings</div>
   </div>
 
   <div class="main">
     <header>
       <div class="logo">⚡ AI Log Analyzer <span class="live">● LIVE</span></div>
-      <button onclick="loadProjects()">Refresh</button>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onclick="loadProjects()">Refresh</button>
+        <button class="create-btn" onclick="openModal()">＋ New Project</button>
+      </div>
     </header>
 
-    <div class="container">
+    <!-- ── PROJECTS PAGE ── -->
+    <div id="projectsPage" class="container">
       <div class="stats">
         <div class="stat-card"><p>Projects</p><h2 id="totalProjects">0</h2></div>
         <div class="stat-card"><p>Errors</p><h2 id="totalErrors">0</h2></div>
@@ -256,20 +403,207 @@
       <h2>Projects</h2>
       <div class="grid" id="projectsContainer"></div>
     </div>
+
+    <!-- ── ERRORS PAGE ── -->
+    <div id="errorsPage" class="container">
+      <p class="page-title">🐞 All Errors</p>
+      <div id="allErrorsContainer"><p style="color:#64748b;">Loading errors...</p></div>
+    </div>
+
+    <!-- ── SETTINGS PAGE ── -->
+    <div id="settingsPage" class="container">
+      <p class="page-title">⚙️ Settings</p>
+
+      <div class="settings-card">
+        <h3>Dashboard</h3>
+        <p>Appearance and behaviour</p>
+        <div class="settings-row">
+          <label>Auto-refresh every 30s</label>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <label>Show low severity errors</label>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>API</h3>
+        <p>Backend endpoint used by the SDK</p>
+        <div style="font-family:monospace;font-size:13px;padding:10px 14px;background:rgba(0,0,0,0.3);border-radius:8px;color:#a5b4fc;">
+          http://127.0.0.1:5000/api/ingest
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>About</h3>
+        <p style="margin:0;color:#64748b;font-size:13px;">AI Log Analyzer — built with Flask + SQLite + Gemini AI</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── CREATE PROJECT MODAL ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Create New Project</h3>
+    <p>A unique API key will be generated for you.</p>
+
+    <div id="modalForm">
+      <label>Project Name</label>
+      <input type="text" id="projectName" placeholder="e.g. My Flask App" />
+
+      <label>Description</label>
+      <textarea id="projectDesc" placeholder="What does this project do?"></textarea>
+
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-submit" onclick="createProject()">Create Project</button>
+      </div>
+    </div>
+
+    <!-- shown after creation -->
+    <div class="api-key-box" id="apiKeyBox">
+      <p>✅ Project created! Here is your API key — copy it now.</p>
+      <div class="api-key-value">
+        <span id="generatedKey"></span>
+        <button class="copy-btn" onclick="copyKey()">Copy</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
   console.log("JS RUNNING");
 
-  /* store all projects for search filtering */
   var allProjects = [];
 
+  // ── PAGE NAVIGATION ──────────────────────────────────
+  function showPage(page) {
+    document.getElementById("projectsPage").style.display = "none";
+    document.getElementById("errorsPage").style.display   = "none";
+    document.getElementById("settingsPage").style.display = "none";
+
+    document.querySelectorAll(".sidebar-item").forEach(function(el) { el.classList.remove("active"); });
+
+    if (page === "projects") {
+      document.getElementById("projectsPage").style.display = "block";
+      document.getElementById("nav-projects").classList.add("active");
+    } else if (page === "errors") {
+      document.getElementById("errorsPage").style.display = "block";
+      document.getElementById("nav-errors").classList.add("active");
+      loadAllErrors();
+    } else if (page === "settings") {
+      document.getElementById("settingsPage").style.display = "block";
+      document.getElementById("nav-settings").classList.add("active");
+    }
+  }
+
+  // ── LOAD ALL ERRORS (errors page) ───────────────────
+  async function loadAllErrors() {
+    var container = document.getElementById("allErrorsContainer");
+    container.innerHTML = "<p style='color:#64748b;'>Loading...</p>";
+
+    try {
+      var projects = await (await fetch("http://127.0.0.1:5000/api/projects")).json();
+      if (!projects.length) { container.innerHTML = "<p style='color:#64748b;'>No projects yet.</p>"; return; }
+
+      var html = "";
+      for (var p of projects) {
+        var errs = await (await fetch("http://127.0.0.1:5000/api/projects/" + p.id + "/errors")).json();
+        if (!errs.length) continue;
+
+        html += "<h3 style='margin:24px 0 10px;color:#a5b4fc;'>" + p.name + "</h3>";
+        html += "<div style='border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);margin-bottom:10px;'>";
+        html += "<table style='width:100%;border-collapse:collapse;'>";
+        html += "<thead><tr style='background:rgba(99,102,241,0.15);'>";
+        html += "<th style='padding:10px 16px;text-align:left;font-size:11px;color:#a5b4fc;text-transform:uppercase;'>Error</th>";
+        html += "<th style='padding:10px 16px;text-align:center;font-size:11px;color:#a5b4fc;text-transform:uppercase;'>Severity</th>";
+        html += "<th style='padding:10px 16px;text-align:right;font-size:11px;color:#a5b4fc;text-transform:uppercase;'>Count</th>";
+        html += "</tr></thead><tbody>";
+
+        var order = { critical: 0, high: 1, medium: 2, low: 3 };
+        errs.sort(function(a,b){ return (order[a.severity.toLowerCase()]||4)-(order[b.severity.toLowerCase()]||4); });
+
+        errs.forEach(function(e, i) {
+          var bg = i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent";
+          html += "<tr style='background:" + bg + ";border-top:1px solid rgba(255,255,255,0.04);'>";
+          html += "<td style='padding:10px 16px;font-size:13px;color:#e2e8f0;'>" + e.message + "</td>";
+          html += "<td style='padding:10px 16px;text-align:center;'>" + severityBadgeHTML(e.severity) + "</td>";
+          html += "<td style='padding:10px 16px;text-align:right;font-size:13px;font-weight:600;color:#f1f5f9;'>" + e.count + "</td>";
+          html += "</tr>";
+        });
+        html += "</tbody></table></div>";
+      }
+
+      container.innerHTML = html || "<p style='color:#64748b;'>No errors detected yet.</p>";
+    } catch(e) {
+      container.innerHTML = "<p style='color:#fca5a5;'>Failed to load errors.</p>";
+    }
+  }
+
+  function severityBadgeHTML(sev) {
+    var s = (sev || "low").toLowerCase();
+    var colors = {
+      critical: "background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3)",
+      high:     "background:rgba(251,146,60,0.15);color:#fdba74;border:1px solid rgba(251,146,60,0.3)",
+      medium:   "background:rgba(250,204,21,0.15);color:#fde047;border:1px solid rgba(250,204,21,0.3)",
+      low:      "background:rgba(148,163,184,0.1);color:#cbd5f5;border:1px solid rgba(148,163,184,0.2)"
+    };
+    return "<span style='padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;" + (colors[s]||colors.low) + "'>" + sev + "</span>";
+  }
+
+  // ── MODAL ────────────────────────────────────────────
+  function openModal() {
+    document.getElementById("projectName").value = "";
+    document.getElementById("projectDesc").value = "";
+    document.getElementById("apiKeyBox").style.display = "none";
+    document.getElementById("modalForm").style.display = "block";
+    document.getElementById("modalOverlay").classList.add("open");
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").classList.remove("open");
+    loadProjects();
+  }
+
+  async function createProject() {
+    var name = document.getElementById("projectName").value.trim();
+    var desc = document.getElementById("projectDesc").value.trim();
+    if (!name) { alert("Please enter a project name."); return; }
+
+    var res = await fetch("http://127.0.0.1:5000/api/projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name, description: desc })
+    });
+    var data = await res.json();
+
+    document.getElementById("generatedKey").innerText = data.api_key;
+    document.getElementById("modalForm").style.display = "none";
+    document.getElementById("apiKeyBox").style.display = "block";
+  }
+
+  function copyKey() {
+    var key = document.getElementById("generatedKey").innerText;
+    navigator.clipboard.writeText(key);
+    var btn = document.querySelector(".copy-btn");
+    btn.innerText = "Copied!";
+    setTimeout(function() { btn.innerText = "Copy"; }, 2000);
+  }
+
+  // close modal on overlay click
+  document.getElementById("modalOverlay").addEventListener("click", function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── LOAD PROJECTS ────────────────────────────────────
   async function loadProjects() {
     const res = await fetch("http://127.0.0.1:5000/api/projects");
     allProjects = await res.json();
 
-    /* fetch errors for every project to get real severity + counts */
     let totalErrors = 0, criticalCount = 0;
     await Promise.all(allProjects.map(async p => {
       try {
@@ -283,8 +617,8 @@
         p._errorCount  = errTotal;
         p._hasCritical = hasCritical;
         p._severity    = hasCritical ? "critical"
-                       : errs.some(e => e.severity && e.severity.toLowerCase() === "high")    ? "high"
-                       : errs.some(e => e.severity && e.severity.toLowerCase() === "medium")  ? "medium"
+                       : errs.some(e => e.severity && e.severity.toLowerCase() === "high")   ? "high"
+                       : errs.some(e => e.severity && e.severity.toLowerCase() === "medium") ? "medium"
                        : "low";
         totalErrors += errTotal;
         if (hasCritical) criticalCount++;
@@ -293,13 +627,12 @@
       }
     }));
 
-    document.getElementById("totalProjects").innerText = allProjects.length;
-    document.getElementById("totalErrors").innerText   = totalErrors;
+    document.getElementById("totalProjects").innerText  = allProjects.length;
+    document.getElementById("totalErrors").innerText    = totalErrors;
     document.getElementById("criticalErrors").innerText = criticalCount;
 
     renderCards(allProjects);
 
-    /* wire up search */
     const searchInput = document.querySelector(".search");
     searchInput.oninput = function() {
       const q = this.value.toLowerCase().trim();
@@ -339,6 +672,7 @@
   async function viewProject(id) {
     const grid = document.getElementById("projectsContainer");
     grid.style.display = "none";
+    document.querySelector(".search-box").style.display = "none";
 
     const detail = document.createElement("div");
     detail.id = "projectDetail";
@@ -364,22 +698,10 @@
       grouped[e.message].count += e.count;
     });
 
-    /* severity sort order */
     const order = { critical: 0, high: 1, medium: 2, low: 3 };
     const rows = Object.entries(grouped).sort((a, b) =>
       (order[a[1].severity.toLowerCase()] ?? 4) - (order[b[1].severity.toLowerCase()] ?? 4)
     );
-
-    const severityBadge = sev => {
-      const s = (sev || "low").toLowerCase();
-      const colors = {
-        critical: "background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3)",
-        high:     "background:rgba(251,146,60,0.15);color:#fdba74;border:1px solid rgba(251,146,60,0.3)",
-        medium:   "background:rgba(250,204,21,0.15);color:#fde047;border:1px solid rgba(250,204,21,0.3)",
-        low:      "background:rgba(148,163,184,0.1);color:#cbd5f5;border:1px solid rgba(148,163,184,0.2)"
-      };
-      return `<span style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;${colors[s]||colors.low}">${sev}</span>`;
-    };
 
     let tableHTML = `
       <div style="margin-top:20px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);">
@@ -398,7 +720,7 @@
       tableHTML += `
         <tr style="background:${bg};border-top:1px solid rgba(255,255,255,0.04);">
           <td style="padding:12px 16px;font-size:13px;color:#e2e8f0;">${msg}</td>
-          <td style="padding:12px 16px;text-align:center;">${severityBadge(data.severity)}</td>
+          <td style="padding:12px 16px;text-align:center;">${severityBadgeHTML(data.severity)}</td>
           <td style="padding:12px 16px;text-align:right;font-size:13px;font-weight:600;color:#f1f5f9;">${data.count}</td>
         </tr>`;
     });
@@ -410,6 +732,7 @@
   function goBack() {
     document.getElementById("projectDetail").remove();
     document.getElementById("projectsContainer").style.display = "flex";
+    document.querySelector(".search-box").style.display = "block";
   }
 
   async function deleteProject(id) {
@@ -423,7 +746,6 @@
     loadProjects();
   };
 
-  /* Split a single AI text blob into 3 sections by heading keywords */
   function splitIntoSections(text) {
     var lines   = text.split("\n");
     var current = "summary";
@@ -433,9 +755,9 @@
       var t = line.trim();
       var isHeading = t.charAt(0) === "#" || /^[A-Z][A-Za-z ]{2,40}:?$/.test(t);
       if (isHeading) {
-        if (/root.{0,5}caus/i.test(t))             { current = "causes";  return; }
+        if (/root.{0,5}caus/i.test(t))                { current = "causes";  return; }
         if (/fix|solution|recommend|suggest/i.test(t)) { current = "fixes";   return; }
-        if (/summary/i.test(t))                     { current = "summary"; return; }
+        if (/summary/i.test(t))                        { current = "summary"; return; }
       }
       buckets[current].push(line);
     });
@@ -461,15 +783,22 @@
       var causesText  = (data.root_causes || "").trim();
       var fixesText   = (data.fixes       || "").trim();
 
-      /* If backend lumps everything into one field, split it */
-      var noSplit = !causesText && !fixesText;
+      var allSame  = summaryText === causesText && causesText === fixesText;
+      var noSplit  = !causesText && !fixesText;
       var allMixed = causesText && /summary/i.test(causesText);
-      if (noSplit || allMixed) {
-        var blob  = summaryText + "\n" + causesText + "\n" + fixesText;
+
+      if (allSame || noSplit || allMixed) {
+        var blob  = summaryText;
         var split = splitIntoSections(blob);
-        summaryText = split.summary;
-        causesText  = split.causes;
-        fixesText   = split.fixes;
+        summaryText = split.summary || summaryText;
+        causesText  = split.causes  || "Root causes will appear once AI quota resets.";
+        fixesText   = split.fixes   || "Fix suggestions will appear once AI quota resets.";
+      }
+
+      if (summaryText.toLowerCase().includes("quota") || summaryText.toLowerCase().includes("unavailable")) {
+        summaryText = "⏳ Gemini API quota reached. The summary will generate automatically once the quota resets.";
+        causesText  = "⏳ Root causes will be available after the quota resets.";
+        fixesText   = "⏳ Fix suggestions will be available after the quota resets.";
       }
 
       panel.innerHTML =

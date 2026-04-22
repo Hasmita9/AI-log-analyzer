@@ -250,7 +250,7 @@ def detect_errors(project_id):
 
         if normalized not in error_map:
             error_map[normalized] = {
-                "message": log["message"],
+                "message": normalized,
                 "count": 0,
                 "first_seen": log["timestamp"],
                 "last_seen": log["timestamp"]
