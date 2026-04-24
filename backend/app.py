@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from parser import parse_line
 import re
 import os
@@ -162,7 +162,7 @@ def create_project():
     description = data.get('description')
 
     api_key = str(uuid.uuid4())
-    created_at = datetime.utcnow().isoformat()
+    created_at = datetime.now(UTC).isoformat()
 
     conn = get_db()
     conn.execute(
@@ -415,7 +415,7 @@ def generate_ai_summary(project_id):
                 text,
                 text,
                 text,
-                datetime.utcnow().isoformat()
+                datetime.now(UTC).isoformat()
             )
         )
 
