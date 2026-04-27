@@ -274,6 +274,9 @@ def detect_errors(project_id):
             return "Medium"
         else:
             return "Low"
+    
+    # Wipe stale errors, then reinsert fresh from current logs
+    conn.execute("DELETE FROM errors WHERE project_id=?", (project_id,))
 
     for err in error_map.values():
         severity = classify(err["message"])

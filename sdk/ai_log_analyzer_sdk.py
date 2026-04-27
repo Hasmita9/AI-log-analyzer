@@ -10,6 +10,7 @@ class LogAnalyzerSDK:
 
     def _send_log(self, message):
         try:
+            print("SENDING LOG:", message)  # ← add this line
             requests.post(
                 f"{self.api_url}/api/ingest",
                 json={"logs": [message]},
@@ -27,6 +28,33 @@ class LogAnalyzerSDK:
         self._send_log(log_message)
 
     def setup_auto_capture(self):
+        sdk_self = self
+
+        class LoggingHandler(logging.Handler):
+            def __init__(self):
+                super().__init__()
+                self._is_handling = False
+
+            def emit(self, record):
+                if self._is_handling:
+                    return
+                if record.levelno < logging.WARNING:
+                    return
+                self._is_handling = True
+                try:
+                    log_entry = self.format(record)
+                    if record.levelno >= logging.ERROR:
+                        sdk_self._send_log(f"ERROR {log_entry}")
+                    elif record.levelno >= logging.WARNING:
+                        sdk_self._send_log(f"WARN {log_entry}")
+                finally:
+                    self._is_handling = False
+
+        handler = LoggingHandler()
+        logging.getLogger().addHandler(handler)
+        logging.getLogger().setLevel(logging.DEBUG)
+
+    def setup_auto_capture2(self):
         class LoggingHandler(logging.Handler):
             def emit(inner_self, record):
                 log_entry = inner_self.format(record)
